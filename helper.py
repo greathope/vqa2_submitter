@@ -89,9 +89,8 @@ def get_remaining_counts(token):
 
 
 def text2acc(address):
-	print(address)
 	try:
-		resp=requests.get(address,timeout=3).text
+		resp=requests.get(address,verify=False).text
 	except:
 		print(resp)
 		return False,None
