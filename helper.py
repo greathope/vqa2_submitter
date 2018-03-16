@@ -89,10 +89,11 @@ def get_remaining_counts(token):
 
 
 def text2acc(address):
+	print(address)
 	try:
-		resp=requests.get(address,verify=False).text
+		resp=requests.get(address).text
 	except:
-		print(resp)
+		print("Make sure you can get access to google website!")
 		return False,None
 	s=resp.split('test-dev')[1]
 	number=s.split("'number':")[1].split(",\n")[0].strip()
@@ -115,6 +116,7 @@ def time_count_down(text, seconds):
 
 
 def run(filename,vqa_log_dir,name_passwd,json_name):
+	finish_flag=False
 	epoch_acc={}
 	idx=int(input("**Which epoch do you want to start**"))
 	max_epoch=int(input("**What is the max epoch?**"))
@@ -129,13 +131,21 @@ def run(filename,vqa_log_dir,name_passwd,json_name):
 		if success==False:
 			print("Fail to get today's remaining submissions")
 			return False
+		if 'remaining_submissions_today_count' not in resp.keys():
+			print("%s cannot submit today"%name)
+			continue
+		
 		remaining_today_count=resp['remaining_submissions_today_count']
-		print("This account can submit %d times"%remaining_today_count)
+		print("%s can submit %d times"%(name,remaining_today_count))
 		
 
 		epoch_id={}
 		stdout=[]#get stdout
 		for i in range(remaining_today_count):
+			if idx == max_epoch:
+				idx+=1
+				finish_flag=True
+				break
 			epoch_dir='epoch_'+str(idx)
 			filepath=os.path.join(vqa_log_dir,epoch_dir,filename)
 			files=open(filepath,'r')
@@ -150,8 +160,6 @@ def run(filename,vqa_log_dir,name_passwd,json_name):
 				return False
 			print("Submitted sucessfuly")
 			epoch_id[idx]=resp['id']
-			if idx == max_epoch:
-				return True
 			idx+=1
 			
 
@@ -180,15 +188,18 @@ def run(filename,vqa_log_dir,name_passwd,json_name):
 					success=False
 					while not success:
 						success,test_dev=text2acc(j['stdout_file'])
+						print("finding the results...")
 						time.sleep(5)
 					epoch_acc[epoch]=test_dev
 
-		print(epoch_acc)
 		print("Have got %d epoch's results"%(idx-1))
 		print("Write this epochs to json file in advance")
 		idx_json_name='./vqa2_'+str(idx-1)+'.json'
 		with open(idx_json_name,'w',encoding='utf-8') as json_file:
 			json.dump(epoch_acc,json_file,ensure_ascii=False)
+
+		if finish_flag==True:
+			break
 	
 	print("Well done, ready to write final results to json file")
 	with open(json_name,'w',encoding='utf-8') as json_file:
@@ -200,7 +211,6 @@ def run(filename,vqa_log_dir,name_passwd,json_name):
 
 
 if __name__=='__main__':
-
 	filename=config.filename
 	vqa_log_dir=config.vqa_log_dir
 	name_passwd=config.name_passwd
@@ -211,6 +221,7 @@ if __name__=='__main__':
 		print("Well done!")
 	else:
 		print("Please try again!")
+
 
 
 
