@@ -93,13 +93,12 @@ def text2acc(address):
 	try:
 		resp=requests.get(address).text
 	except:
-		print("Make sure you can get access to google website!")
 		return False,None
 	s=resp.split('test-dev')[1]
-	number=s.split("'number':")[1].split(",\n")[0].strip()
-	other=s.split("'other':")[1].split(",\n")[0].strip()
-	overall=s.split("'overall':")[1].split(",\n")[0].strip()
-	yes_no=s.split("'yes/no':")[1].split(",\n")[0].strip().split('}}')[0]
+	number=s.split("'number':")[1].split(",")[0].strip()
+	other=s.split("'other':")[1].split(",")[0].strip()
+	overall=s.split("'overall':")[1].split(",")[0].strip()
+	yes_no=s.split("'yes/no':")[1].split(",")[0].strip().split('}}')[0]
 	return True,{'number':float(number),'other':float(other),'overall':float(overall),'yes/no':float(yes_no)}
 
 def time_count_down(text, seconds):
@@ -212,6 +211,7 @@ def run(filename,vqa_log_dir,name_passwd,json_name):
 
 
 if __name__=='__main__':
+
 	filename=config.filename
 	vqa_log_dir=config.vqa_log_dir
 	name_passwd=config.name_passwd
@@ -222,6 +222,7 @@ if __name__=='__main__':
 		print("Well done!")
 	else:
 		print("Please try again!")
+
 
 
 
