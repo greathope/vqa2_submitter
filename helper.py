@@ -142,10 +142,6 @@ def run(filename,vqa_log_dir,name_passwd,json_name):
 		epoch_id={}
 		stdout=[]#get stdout
 		for i in range(remaining_today_count):
-			if idx == max_epoch:
-				idx+=1
-				finish_flag=True
-				break
 			epoch_dir='epoch_'+str(idx)
 			filepath=os.path.join(vqa_log_dir,epoch_dir,filename)
 			files=open(filepath,'r')
@@ -160,7 +156,12 @@ def run(filename,vqa_log_dir,name_passwd,json_name):
 				return False
 			print("Submitted sucessfuly")
 			epoch_id[idx]=resp['id']
+			
 			idx+=1
+			if idx == max_epoch+1:
+				finish_flag=True
+				break
+
 			
 
 
